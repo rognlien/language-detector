@@ -1,0 +1,50 @@
+# .github/workflows/publish.yml
+name: Publish snapshot to GitHub Packages
+
+on:
+  push:
+    branches: [ main ]        # or your default branch
+    paths-ignore: [ "**/*.md" ]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write             # << required for publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Java
+        # Use temurin; choose your version
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # (Optional) sanity check: can we access the package endpoint with this GITHUB_TOKEN?
+      - name: Verify package auth
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -eux
+          curl -u "$GITHUB_ACTOR:$GITHUB_TOKEN" -I \
+            "https://maven.pkg.github.com/rognlien/language-detector/com/github/rognlien/language-detector/maven-metadata.xml" || true
+          echo "Actor: $GITHUB_ACTOR"
+
+      - name: Build
+        run: ./gradlew --no-daemon clean build
+
+      - name: Publish
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BUILD_NUMBER: ${{ github.ref == 'refs/heads/main' && github.run_number ||  format('{0}-{1}', env.NORMALIZED_BRANCH_NAME, github.run_number) }}
+        run: ./gradlew --no-daemon publish
