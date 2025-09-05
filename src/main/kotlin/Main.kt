@@ -9,7 +9,7 @@ fun main() {
 
     val outputDir = File("/Users/bendik/language-detection/profiles/")
 
-    root.listFiles { it.isDirectory && it.name.matches("[a-z]{3}".toRegex()) }?.forEach {
+    root.listFiles { it.isDirectory && it.name.matches("[a-z]{3}".toRegex()) }?.filter { it.name == "nob" }?.forEach {
         val language = it.name
         val builder = LanguageProfileBuilder(language)
 
@@ -18,7 +18,11 @@ fun main() {
             .forEach { file ->
                 println("Processing ${file.name}")
                 file.useLines { lines ->
-                    lines.forEach { builder.append(it) }
+                    lines.take(40000000).forEachIndexed { i, it -> 
+                        if(i % 100000 == 0) {
+                            println(i)
+                        }
+                        builder.append(it) }
                 }
             }
 

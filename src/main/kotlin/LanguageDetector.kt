@@ -1,6 +1,5 @@
 package com.github.rognlien
 
-import java.io.File
 import java.net.JarURLConnection
 import java.nio.file.Files
 import java.nio.file.Paths
@@ -11,9 +10,8 @@ object LanguageDetector {
     private val profiles: List<LanguageProfile>
 
     init {
-        println("Loading Profiles")
         profiles = loadProfiles()
-        println("Profiles: ${profiles.joinToString { it.language }}")
+        profiles.forEach { println("Profile: ${it.language} ${it.ngrams.size}") }
     }
 
     @JvmStatic
@@ -71,27 +69,6 @@ object LanguageDetector {
 
         return names.mapNotNull { path ->
             cl.getResourceAsStream(path)?.use { LanguageProfileCodec.read(it) }
-        }
-    }
-
-    /*
-    private fun loadProfiles(): List<LanguageProfile> {
-        return this::class.java.getResource("/profiles")?.toURI()?.let {
-            loadProfiles(File(it))
-        } ?: emptyList()
-    }
-
-     */
-
-    private fun loadProfiles(dir: File): List<LanguageProfile> {
-        return dir.listFiles { file -> file.extension == "bin" }?.map { file ->
-            loadProfile(file)
-        } ?: emptyList()
-    }
-
-    private fun loadProfile(file: File): LanguageProfile {
-        return file.inputStream().use { input ->
-            LanguageProfileCodec.read(input)
         }
     }
 }

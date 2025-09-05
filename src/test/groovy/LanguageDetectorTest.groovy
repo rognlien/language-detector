@@ -14,7 +14,7 @@ class LanguageDetectorTest extends Specification {
         where:
             expected    | text
             "nno"       | "Eg bråvaknar av ein underleg lyd rett utanfor huset. Kva i alle dagar var det der? Eg gnir litt søvn ut av auga og kikar meg rundt. Ein høg melodi tutar i veg med korte støytar der ute. Kva skjer? Så kjem eg på at det er noko med denne dagen som eg skulle hugse. Men kva? Har eg bursdag?"
-            "eng"       | "The quick brown fox jumps over the lazy dog"
+            "eng"       | "The quick brown fox jumps over the lazy dog late on a friday afternoon"
             "nob"       | "Dette er en historie om de tre små fisk, som endte sine dager i en fiskehandlers disk."
     }
 }
