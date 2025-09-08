@@ -18,11 +18,12 @@ fun main() {
             .forEach { file ->
                 println("Processing ${file.name}")
                 file.useLines { lines ->
-                    lines.take(40000000).forEachIndexed { i, it -> 
-                        if(i % 100000 == 0) {
+                    lines.take(40000000).forEachIndexed { i, it ->
+                        if (i % 100000 == 0) {
                             println(i)
                         }
-                        builder.append(it) }
+                        builder.append(it)
+                    }
                 }
             }
 
