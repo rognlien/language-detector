@@ -10,9 +10,10 @@ class LanguageProfileBuilder(private val language: String) {
     }
 
     fun build(maxNgrams: Int = DEFAULT_MAX_NGRAMS): LanguageProfile {
-        val top = ngrams.entries
-            .sortedByDescending { it.value }
-            .take(maxNgrams)
+        val top =
+            ngrams.entries
+                .sortedByDescending { it.value }
+                .take(maxNgrams)
         val total = top.sumOf { it.value }.toDouble()
         val normalized = top.associate { it.key to it.value / total }
         return LanguageProfile(language, normalized)
