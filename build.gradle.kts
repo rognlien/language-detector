@@ -6,10 +6,15 @@ plugins {
     id("groovy")
     id("java-library")
     id("maven-publish")
+    id("application")
 
     kotlin("jvm") version "2.1.20"
 
     id("org.jlleitschuh.gradle.ktlint") version "12.1.1"
+}
+
+application {
+    mainClass.set("com.github.rognlien.MainKt")
 }
 
 group = "com.github.rognlien"

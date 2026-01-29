@@ -6,26 +6,28 @@ import java.nio.file.Paths
 import java.util.jar.JarFile
 
 object LanguageDetector {
-    private val nRange = 2..3
-    private val profiles: List<LanguageProfile>
+    private val profiles: List<LanguageProfile> by lazy { loadProfiles() }
+    private val idfWeights: Map<String, Double> by lazy { computeIdf(profiles) }
 
-    init {
-        profiles = loadProfiles()
-        profiles.forEach { println("Profile: ${it.language} ${it.ngrams.size}") }
-    }
+    data class DetectionResult(val language: String, val score: Double)
 
     @JvmStatic
     fun detect(text: String): String? {
-        val ngrams = NgramExtractor.extract(text, nRange)
-        if (ngrams.isEmpty()) return null
+        return detectAll(text).firstOrNull()?.language
+    }
+
+    @JvmStatic
+    fun detectAll(text: String): List<DetectionResult> {
+        val ngrams = NgramExtractor.extract(text)
+        if (ngrams.isEmpty()) return emptyList()
 
         val inputFreq = ngrams.groupingBy { it }.eachCount()
         val inputTotal = inputFreq.values.sum().toDouble()
         val inputNorm = inputFreq.mapValues { it.value / inputTotal }
 
-        return profiles.maxByOrNull { profile ->
-            score(inputNorm, profile.ngrams)
-        }?.language
+        return profiles.map { profile ->
+            DetectionResult(profile.language, score(inputNorm, profile.ngrams))
+        }.sortedByDescending { it.score }
     }
 
     private fun score(
@@ -33,8 +35,19 @@ object LanguageDetector {
         profile: Map<String, Double>,
     ): Double {
         return input.entries.sumOf { (ng, freq) ->
-            freq * (profile[ng] ?: 0.0)
+            freq * (profile[ng] ?: 0.0) * (idfWeights[ng] ?: 1.0)
         }
+    }
+
+    private fun computeIdf(profiles: List<LanguageProfile>): Map<String, Double> {
+        val n = profiles.size.toDouble()
+        val docFreq = mutableMapOf<String, Int>()
+        for (profile in profiles) {
+            for (ng in profile.ngrams.keys) {
+                docFreq.merge(ng, 1, Int::plus)
+            }
+        }
+        return docFreq.mapValues { (_, df) -> kotlin.math.ln(n / df) }
     }
 
     private fun loadProfiles(): List<LanguageProfile> {
