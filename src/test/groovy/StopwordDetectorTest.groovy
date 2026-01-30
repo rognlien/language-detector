@@ -34,6 +34,15 @@ class StopwordDetectorTest extends Specification {
             "afr"    | "Die vir ons nie"
             "isl"    | "Ekki og hann"
             "lat"    | "Est quod atque enim"
+            "rus"    | "\u041d\u0435 \u0431\u044b\u043b\u043e \u0435\u0449\u0435 \u0442\u043e\u043b\u044c\u043a\u043e"
+            "ukr"    | "\u0429\u043e \u0431\u0443\u043b\u043e \u0442\u0456\u043b\u044c\u043a\u0438 \u0432\u0436\u0435"
+            "srp"    | "\u0411\u0438\u043e \u043a\u0430\u043e \u0430\u043b\u0438 \u0458\u043e\u0448"
+            "ara"    | "\u0641\u064a \u0647\u0630\u0627 \u0639\u0644\u0649 \u0623\u0646"
+            "arm"    | "\u0587 \u0561\u0575\u0564 \u0574\u0565\u056f \u0562\u0561\u0575\u0581"
+            "vie"    | "C\u1ee7a v\u00e0 l\u00e0 kh\u00f4ng"
+            "ceb"    | "Ang mga sa nga"
+            "sme"    | "Lea leat ahte mii"
+            "yor"    | "N\u00ed s\u00ed t\u00ed f\u00fan"
     }
 
     def "Detect returns null for empty input"() {

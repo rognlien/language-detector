@@ -32,6 +32,10 @@ class CombinedDetectorTest extends Specification {
             "lit"    | "Greita ruda lapė peršoka per tingų šunį vėlyvą penktadienio popietę. Tai buvo nuostabi diena pasivaikščioti parke ir mėgautis gamta. Saulė švietė ryškiai ir vėjas lengvai pūtė per medžių viršūnes. Tokios dienos retai pasitaiko šiuo metų laiku."
             "ind"    | "Rubah cokelat cepat melompati anjing malas pada suatu sore hari Jumat yang tenang. Hari itu sangat indah untuk berjalan-jalan di taman."
             "afr"    | "Die vinnige bruin jakkals spring oor die lui hond op 'n rustige Vrydagmiddag. Dit was 'n pragtige dag om buite te wees en die mooi weer te geniet."
+            "vie"    | "Con m\u00e8o nh\u1ecf ng\u1ee7 y\u00ean l\u1eb7ng tr\u00ean gh\u1ebf so pha trong khi tr\u1eddi m\u01b0a nh\u1eb9 b\u00ean ngo\u00e0i. \u0110\u00f3 l\u00e0 m\u1ed9t bu\u1ed5i t\u1ed1i y\u00ean t\u0129nh v\u00e0 \u0111\u1eb9p \u0111\u1ebd \u0111\u1ecdc s\u00e1ch \u1edf nh\u00e0."
+            "ceb"    | "Ang gamay nga iring natulog sa sofa samtang ang ulan mihunong sa gawas. Kini usa ka malinawon nga gabii alang sa pagbasa ug libro sa balay."
+            "sme"    | "Unna bussá oađđá soffás dan bottu go arvá olgun. Dat lea jaskes eahket lohkat girjji. Mii leat dás ja eat dárbba\u0161 mannat olggos."
+            "yor"    | "Ologbo kekere n\u00e0\u00e1 s\u00fan l\u00f3r\u00ed al\u00e0ga n\u00edgb\u00e0 t\u00ed \u00f2j\u00f2 n\u0300r\u1ecd\u0300 s\u00edl\u1eb9\u0300 n\u00ed \u00ecta. \u00d3 j\u1eb9\u0301 al\u1eb9\u0301 \u00e0l\u00e0\u00e1f\u00ed\u00e0 f\u00fan k\u00edk\u00e0 \u00edw\u00e9 n\u00ed il\u00e9."
     }
 
     def "Detect non-Latin-script languages unique to LanguageDetector"() {
