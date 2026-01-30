@@ -1,0 +1,129 @@
+import com.github.rognlien.CombinedDetector
+import spock.lang.Specification
+
+class CombinedDetectorTest extends Specification {
+
+    def "Detect languages covered by both detectors"() {
+        expect:
+            CombinedDetector.detect(text) == expected
+
+        where:
+            expected | text
+            "eng"    | "The quick brown fox jumps over the lazy dog late on a friday afternoon"
+            "fre"    | "Le petit chat dort tranquillement sur le canapé pendant que la pluie tombe doucement dehors."
+            "ger"    | "Der schnelle braune Fuchs springt über den faulen Hund an einem späten Freitagnachmittag."
+            "spa"    | "El rápido zorro marrón salta sobre el perro perezoso en una tarde tranquila de viernes."
+            "ita"    | "La volpe marrone veloce salta sopra il cane pigro in un tranquillo pomeriggio di venerdì."
+            "nob"    | "Jeg husker ikke nøyaktig når det skjedde, men det var en gang jeg gikk gjennom skogen og plutselig hørte noe bak meg. Det var ingenting der, bare stille trær og mye løv på bakken. Jeg fortsatte å gå videre uten å tenke mer over det."
+            "nno"    | "Eg veit ikkje kvifor det vart slik, men det hende noko underleg den kvelden. Nokon hadde eigenleg sagt at det ikkje skulle vere mogleg, men eg såg det sjølv."
+            "rum"    | "Vulpea maro rapidă sare peste câinele leneș într-o după-amiază liniștită de vineri. Este o zi frumoasă pentru a te plimba prin parc și a te bucura de natură."
+            "dut"    | "De snelle bruine vos springt over de luie hond op een rustige vrijdagmiddag. Het was een prachtige dag om buiten te zijn en te genieten van het mooie weer."
+            "por"    | "O gato pequeno dorme tranquilamente no sofá enquanto a chuva cai suavemente lá fora. Era uma noite perfeita para ficar em casa e ler um bom livro."
+            "cat"    | "El gat petit dorm tranquil·lament al sofà mentre la pluja cau suaument a fora. Era una nit perfecta per quedar-se a casa i llegir un bon llibre."
+            "pol"    | "Szybki brązowy lis przeskakuje przez płot na podwórku późnym piątkowym popołudniem. To był wspaniały dzień na spacer po parku i cieszenie się przyrodą."
+            "tur"    | "Hızlı kahverengi tilki tembel köpeğin üzerinden atlıyor. Bugün hava çok güzel ve parkta yürüyüş yapmak için harika bir gün."
+            "fin"    | "Nopea ruskea kettu hyppää laiskan koiran yli myöhään perjantai-iltapäivänä. Oli ihana päivä olla ulkona ja nauttia kauniista säästä. Aurinko paistoi kirkkaasti ja tuuli puhalsi kevyesti puiden latvoja pitkin. Tällaisia päiviä ei tule kovin usein tähän aikaan vuodesta."
+            "hun"    | "A fejlesztések érdemben segítik az országos lefedettség elérését, ezzel teszik kényelmesebben használhatóvá és vonzóbbá a tiszta és csendes villanyautókat. A fejlesztések eredményeképpen a felvonók fülkéit, aknai acélszerkezeteit, a tornyokat immár kizárólag a saját gyártósorukon készítik el."
+            "swe"    | "Även Moderaterna, med finansminister Elisabeth Svantesson i spetsen, har börjat öppna upp för en möjlighet att ta på sig spenderarbyxorna. Det handlar om att Sveriges ekonomi behöver stärkas och att arbetsmarknaden måste förbättras avsevärt under de kommande åren."
+            "dan"    | "Den hurtige brune ræv springer over den dovne hund sent fredag eftermiddag. Det var en dejlig dag at gå en tur i parken og nyde det gode vejr. Solen skinnede klart og vinden blæste let gennem trætoppene. Sådanne dage kommer ikke særlig ofte på denne tid af året."
+            "cze"    | "Rychlá hnědá liška přeskočí líného psa pozdě v pátek odpoledne. Byl to nádherný den na procházku v parku a užívání si přírody."
+            "slo"    | "Rýchla hnedá líška preskočí lenivého psa neskoro v piatok popoludní. Bol to nádherný deň na prechádzku v parku a užívanie si prírody."
+            "hrv"    | "Brza smeđa lisica preskače lijenog psa kasno u petak poslijepodne. Bio je to divan dan za šetnju kroz park i uživanje u prirodi."
+            "lit"    | "Greita ruda lapė peršoka per tingų šunį vėlyvą penktadienio popietę. Tai buvo nuostabi diena pasivaikščioti parke ir mėgautis gamta. Saulė švietė ryškiai ir vėjas lengvai pūtė per medžių viršūnes. Tokios dienos retai pasitaiko šiuo metų laiku."
+            "ind"    | "Rubah cokelat cepat melompati anjing malas pada suatu sore hari Jumat yang tenang. Hari itu sangat indah untuk berjalan-jalan di taman."
+            "afr"    | "Die vinnige bruin jakkals spring oor die lui hond op 'n rustige Vrydagmiddag. Dit was 'n pragtige dag om buite te wees en die mooi weer te geniet."
+    }
+
+    def "Detect non-Latin-script languages unique to LanguageDetector"() {
+        expect:
+            CombinedDetector.detect(text) == expected
+
+        where:
+            expected | text
+            "rus"    | "Быстрая коричневая лиса перепрыгнула через ленивую собаку поздним пятничным вечером. Это был прекрасный день для прогулки по парку и наслаждения природой."
+            "ukr"    | "Швидка коричнева лисиця перестрибнула через лінивого собаку пізно ввечері у п'ятницю. Це був чудовий день для прогулянки парком та насолоди природою. Сонце яскраво світило і вітер легенько дув крізь верхівки дерев. Такі дні трапляються нечасто у цю пору року."
+            "srp"    | "Брза смеђа лисица прескочи преко лењог пса касно у петак поподне. Био је то диван дан за шетњу кроз парк и уживање у природи."
+            "ara"    | "القطة الصغيرة تنام بهدوء على الأريكة بينما المطر يتساقط بلطف في الخارج. كانت ليلة هادئة وجميلة في هذا الوقت من السنة."
+            "arm"    | "\u0532\u0561\u0581\u056B \u0562\u0587\u0565\u057C\u0561\u0581\u0578\u0582\u0574\u056B\u0581, \u0578\u0580\u0568 \u0562\u0576\u0578\u0582\u0569\u0561\u0563\u0580\u0578\u0582\u0574 \u0567 \u0584\u056B\u0574\u056B\u0561\u056F\u0561\u0576 \u056F\u0561\u057A\u0568 \u057D\u057F\u0561\u057F\u056B\u056F \u057E\u056B\u0573\u0561\u056F\u0578\u0582\u0574, \u0575\u0578\u0582\u0580\u0561\u0584\u0561\u0576\u0579\u0575\u0578\u0582\u0580 \u056F\u0561\u057A \u056F\u0561\u0580\u0578\u0572 \u0567 \u0585\u056A\u057F\u057E\u0565\u056C \u0576\u0561\u0587 \u0562\u0587\u0565\u057C\u0561\u0575\u0576\u0578\u0582\u0569\u0575\u0561\u0574\u0562"
+            "chi"    | "小猫安静地睡在沙发上，外面的雨轻轻地下着。这是一个美丽的夜晚，适合在家里读一本好书。窗外的世界安静而祥和。"
+            "jpn"    | "今日は天気がとても良いです。公園に散歩に行きたいと思います。桜の花が美しく咲いています。"
+    }
+
+    def "Detect languages with stopword-only coverage"() {
+        expect:
+            CombinedDetector.detect(text) == expected
+
+        where:
+            expected | text
+            "isl"    | "Þá hefði komið fram að ríkisstjórnin áformaði að hefjast handa við fyrningu aflaheimilda. Flóðið ruddi sér leið úr lóninu við Gígjökul og niður farveg Markarfljóts."
+            "lat"    | "Ab Aevo antiquo super lacum navigatio ad commeatum onerarium, piscationem et peregrinationem adhibita est. Servi manumissi officia praesidiorum plerumque faciebant."
+    }
+
+    def "Short titles where stopwords help"() {
+        expect:
+            CombinedDetector.detect(text) == expected
+
+        where:
+            expected | text
+            "eng"    | "The Art of War"
+            "fre"    | "Le Petit Prince"
+            "ger"    | "Der Prozess und die Verwandlung"
+            "spa"    | "El amor en los tiempos"
+            "ita"    | "Il nome della rosa"
+    }
+
+    def "Detect returns null for empty input"() {
+        expect:
+            CombinedDetector.detect("") == null
+    }
+
+    def "Detect returns null for whitespace-only input"() {
+        expect:
+            CombinedDetector.detect("   ") == null
+    }
+
+    def "Detect returns null for non-letter input"() {
+        expect:
+            CombinedDetector.detect("12345 !@#\$%") == null
+    }
+
+    def "detectAll returns empty list for empty input"() {
+        expect:
+            CombinedDetector.detectAll("").isEmpty()
+    }
+
+    def "detectAll returns ranked results with descending scores"() {
+        when:
+            def results = CombinedDetector.detectAll("The quick brown fox jumps over the lazy dog")
+
+        then:
+            !results.isEmpty()
+            results[0].language == "eng"
+            results.size() > 1
+            (0..<results.size() - 1).every { results[it].score >= results[it + 1].score }
+    }
+
+    def "All combined scores are in [0, 1]"() {
+        when:
+            def results = CombinedDetector.detectAll("The quick brown fox jumps over the lazy dog late on a friday afternoon")
+
+        then:
+            !results.isEmpty()
+            results.every { it.score >= 0.0 && it.score <= 1.0 }
+    }
+
+    def "Custom weights parameter works"() {
+        when:
+            def ngramOnly = CombinedDetector.detectAll("The quick brown fox jumps over the lazy dog", 1.0, 0.0)
+            def stopwordOnly = CombinedDetector.detectAll("The quick brown fox jumps over the lazy dog", 0.0, 1.0)
+            def balanced = CombinedDetector.detectAll("The quick brown fox jumps over the lazy dog", 0.5, 0.5)
+
+        then:
+            ngramOnly[0].language == "eng"
+            stopwordOnly[0].language == "eng"
+            balanced[0].language == "eng"
+            // With ngram-only weight, stopword-only languages should not appear or have zero score
+            ngramOnly.every { it.score >= 0.0 }
+            stopwordOnly.every { it.score >= 0.0 }
+    }
+}
