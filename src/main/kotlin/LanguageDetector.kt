@@ -9,8 +9,6 @@ object LanguageDetector {
     private val profiles: List<LanguageProfile> by lazy { loadProfiles() }
     private val idfWeights: Map<String, Double> by lazy { computeIdf(profiles) }
 
-    data class DetectionResult(val language: String, val score: Double)
-
     @JvmStatic
     fun detect(text: String): String? {
         return detectAll(text).firstOrNull()?.language
