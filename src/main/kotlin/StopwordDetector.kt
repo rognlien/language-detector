@@ -109,6 +109,12 @@ object StopwordDetector {
                     "have", "has", "had", "do", "does", "did", "will", "would", "shall",
                     "should", "may", "might", "must", "can", "could", "this", "that",
                     "these", "those", "not", "and", "but", "or", "if", "then", "than",
+                    "to", "of", "in", "for", "on", "at", "by", "with", "from", "about",
+                    "i", "you", "he", "she", "it", "we", "they",
+                    "me", "him", "her", "us", "them",
+                    "my", "your", "his", "its", "our", "their",
+                    "what", "who", "which", "how", "when", "where",
+                    "no", "so", "there", "all", "just", "also", "more", "only", "very", "as",
                 ),
             "fre" to
                 setOf(

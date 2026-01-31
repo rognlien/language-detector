@@ -70,6 +70,8 @@ class CombinedDetectorTest extends Specification {
         where:
             expected | text
             "eng"    | "The Art of War"
+            "eng"    | "How to Live by Faith"
+            "eng"    | "Traffic On Line Proven Strategies for Driving Massive Online Traffic to Your Website"
             "fre"    | "Le Petit Prince"
             "ger"    | "Die Verwandlung"
             "ger"    | "Der Prozess und die Verwandlung"
