@@ -22,11 +22,14 @@ object CombinedDetector {
 
         if (ngramResults.isEmpty() && stopwordResults.isEmpty()) return emptyList()
 
+        val wordCount = text.split(Regex("[^\\p{L}]+")).count { it.isNotEmpty() }
+        val useNgrams = stopwordResults.isEmpty() || wordCount >= 4
+
         val ngramMax = ngramResults.maxOfOrNull { it.score } ?: 0.0
         val stopwordMax = stopwordResults.maxOfOrNull { it.score } ?: 0.0
 
         val ngramNorm =
-            if (ngramMax > 0.0) {
+            if (useNgrams && ngramMax > 0.0) {
                 ngramResults.associate { it.language to it.score / ngramMax }
             } else {
                 emptyMap()

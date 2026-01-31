@@ -71,6 +71,7 @@ class CombinedDetectorTest extends Specification {
             expected | text
             "eng"    | "The Art of War"
             "fre"    | "Le Petit Prince"
+            "ger"    | "Die Verwandlung"
             "ger"    | "Der Prozess und die Verwandlung"
             "spa"    | "El amor en los tiempos"
             "ita"    | "Il nome della rosa"
