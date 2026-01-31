@@ -5,6 +5,8 @@ import kotlin.math.ln
 object StopwordDetector {
     private val stopwords: Map<String, Set<String>> by lazy { buildStopwords() }
     private val idfWeights: Map<String, Double> by lazy { computeIdf(stopwords) }
+    private val charHints: Map<Char, Set<String>> by lazy { buildCharHints() }
+    private val charIdfWeights: Map<Char, Double> by lazy { computeCharIdf(charHints) }
 
     @JvmStatic
     fun detect(text: String): String? {
@@ -14,19 +16,26 @@ object StopwordDetector {
     @JvmStatic
     fun detectAll(text: String): List<DetectionResult> {
         val words = tokenize(text)
-        if (words.isEmpty()) return emptyList()
+        val chars = text.lowercase().toSet()
+        if (words.isEmpty() && chars.none { it in charHints }) return emptyList()
 
-        val scores =
-            stopwords.map { (language, wordSet) ->
-                val score =
-                    words.sumOf { word ->
-                        if (word in wordSet) idfWeights[word] ?: 0.0 else 0.0
-                    }
-                DetectionResult(language, score)
-            }.filter { it.score > 0.0 }
-                .sortedByDescending { it.score }
+        val scoreMap = mutableMapOf<String, Double>()
 
-        return scores
+        for ((language, wordSet) in stopwords) {
+            val score = words.sumOf { word -> if (word in wordSet) idfWeights[word] ?: 0.0 else 0.0 }
+            if (score > 0.0) scoreMap[language] = score
+        }
+
+        for (ch in chars) {
+            val languages = charHints[ch] ?: continue
+            val weight = charIdfWeights[ch] ?: continue
+            for (language in languages) {
+                scoreMap.merge(language, weight, Double::plus)
+            }
+        }
+
+        return scoreMap.map { (language, score) -> DetectionResult(language, score) }
+            .sortedByDescending { it.score }
     }
 
     private fun tokenize(text: String): List<String> {
@@ -47,6 +56,50 @@ object StopwordDetector {
             if (df >= n.toInt()) 0.0 else ln(n / df)
         }
     }
+
+    private fun computeCharIdf(charHints: Map<Char, Set<String>>): Map<Char, Double> {
+        val n = stopwords.size.toDouble()
+        return charHints.mapValues { (_, langs) ->
+            val df = langs.size
+            if (df >= n.toInt()) 0.0 else ln(n / df)
+        }
+    }
+
+    private fun buildCharHints(): Map<Char, Set<String>> =
+        mapOf(
+            // Nordic
+            'ø' to setOf("nob", "nno", "dan"),
+            'å' to setOf("nob", "nno", "dan", "swe"),
+            'æ' to setOf("nob", "nno", "dan", "isl"),
+            'þ' to setOf("isl"),
+            'ð' to setOf("isl"),
+            // Germanic
+            'ä' to setOf("swe", "ger", "fin"),
+            'ö' to setOf("swe", "ger", "fin", "tur", "hun", "isl"),
+            'ü' to setOf("ger", "tur", "hun"),
+            'ß' to setOf("ger"),
+            // Romance
+            'ñ' to setOf("spa"),
+            'ã' to setOf("por"),
+            'õ' to setOf("por"),
+            'ç' to setOf("fre", "por", "tur", "cat"),
+            // Slavic/Baltic
+            'ł' to setOf("pol"),
+            'ř' to setOf("cze"),
+            'ů' to setOf("cze"),
+            'ě' to setOf("cze"),
+            'ľ' to setOf("slo"),
+            'ė' to setOf("lit"),
+            // Other
+            'ő' to setOf("hun"),
+            'ű' to setOf("hun"),
+            'ğ' to setOf("tur"),
+            'ı' to setOf("tur"),
+            'ă' to setOf("rum", "vie"),
+            'ș' to setOf("rum"),
+            'ț' to setOf("rum"),
+            'đ' to setOf("vie", "hrv"),
+        )
 
     private fun buildStopwords(): Map<String, Set<String>> =
         mapOf(

@@ -81,4 +81,39 @@ class StopwordDetectorTest extends Specification {
             StopwordDetector.detect("THE ART OF WAR") == "eng"
             StopwordDetector.detect("LE PETIT PRINCE") == "fre"
     }
+
+    def "Detect languages from character hints alone"() {
+        expect:
+            StopwordDetector.detect(text) == expected
+
+        where:
+            expected | text
+            "ger"    | "Straße"
+            "isl"    | "Þetta"
+            "spa"    | "España"
+            "pol"    | "Łódź"
+            "cze"    | "Příběh"
+            "hun"    | "Győr"
+            "lit"    | "Kėdainiai"
+    }
+
+    def "Character hints add to stopword scores"() {
+        when:
+            def withHint = StopwordDetector.detectAll("Die Straße ist nicht")
+            def withoutHint = StopwordDetector.detectAll("Die Strasse ist nicht")
+
+        then:
+            withHint[0].language == "ger"
+            withoutHint[0].language == "ger"
+            withHint[0].score > withoutHint[0].score
+    }
+
+    def "Repeated characters do not multiply the bonus"() {
+        when:
+            def single = StopwordDetector.detectAll("Straße")
+            def repeated = StopwordDetector.detectAll("Straße Straße Straße")
+
+        then:
+            single.find { it.language == "ger" }.score == repeated.find { it.language == "ger" }.score
+    }
 }
