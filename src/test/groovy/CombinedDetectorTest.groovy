@@ -79,6 +79,24 @@ class CombinedDetectorTest extends Specification {
             "ita"    | "Il nome della rosa"
     }
 
+    def "Short English titles with no stopwords"() {
+        expect:
+            CombinedDetector.detect(text) == expected
+
+        where:
+            expected | text
+            "eng"    | "Pretty Simple Cocktails"
+            "eng"    | "Mystique"
+            "eng"    | "Karna"
+            "eng"    | "Crossroads"
+            "eng"    | "Broken Promises"
+            "eng"    | "Silent Witness"
+            "eng"    | "Digital Fortress"
+            "eng"    | "Lost Horizon"
+            "eng"    | "Wild Cards"
+            "eng"    | "Dark Matter"
+    }
+
     def "Detect returns null for empty input"() {
         expect:
             CombinedDetector.detect("") == null

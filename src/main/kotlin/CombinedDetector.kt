@@ -1,6 +1,11 @@
 package com.github.rognlien
 
+import kotlin.math.ln
+
 object CombinedDetector {
+    private const val SHORT_TEXT_NGRAM_SCALE = 0.3
+    private const val LANGUAGE_COUNT = 34.0
+
     @JvmStatic
     fun detect(text: String): String? {
         return detectAll(text).firstOrNull()?.language
@@ -18,19 +23,31 @@ object CombinedDetector {
         stopwordWeight: Double,
     ): List<DetectionResult> {
         val ngramResults = LanguageDetector.detectAll(text)
-        val stopwordResults = StopwordDetector.detectAll(text)
+        val originalStopwordResults = StopwordDetector.detectAll(text)
+        val stopwordResults = originalStopwordResults.toMutableList()
 
         if (ngramResults.isEmpty() && stopwordResults.isEmpty()) return emptyList()
 
+        if (isBasicLatinOnly(text) && originalStopwordResults.isEmpty()) {
+            stopwordResults.add(DetectionResult("eng", ln(LANGUAGE_COUNT / 2.0)))
+        }
+
         val wordCount = text.split(Regex("[^\\p{L}]+")).count { it.isNotEmpty() }
-        val useNgrams = stopwordResults.isEmpty() || wordCount >= 4
+        val bonusInjected = stopwordResults.size > originalStopwordResults.size
+        val ngramScale =
+            when {
+                wordCount >= 4 -> 1.0
+                originalStopwordResults.isNotEmpty() -> 0.0
+                bonusInjected -> SHORT_TEXT_NGRAM_SCALE
+                else -> 1.0
+            }
 
         val ngramMax = ngramResults.maxOfOrNull { it.score } ?: 0.0
         val stopwordMax = stopwordResults.maxOfOrNull { it.score } ?: 0.0
 
         val ngramNorm =
-            if (useNgrams && ngramMax > 0.0) {
-                ngramResults.associate { it.language to it.score / ngramMax }
+            if (ngramScale > 0.0 && ngramMax > 0.0) {
+                ngramResults.associate { it.language to it.score / ngramMax * ngramScale }
             } else {
                 emptyMap()
             }
@@ -56,5 +73,10 @@ object CombinedDetector {
                 }
             DetectionResult(lang, blended)
         }.sortedByDescending { it.score }
+    }
+
+    private fun isBasicLatinOnly(text: String): Boolean {
+        return text.any { it.isLetter() } &&
+            text.all { !it.isLetter() || it in 'A'..'Z' || it in 'a'..'z' }
     }
 }
