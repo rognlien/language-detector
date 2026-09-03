@@ -1,4 +1,7 @@
 import com.github.rognlien.LanguageDetector
+import com.github.rognlien.LanguageProfile
+import com.github.rognlien.LanguageProfileCodec
+import com.github.rognlien.NgramExtractor
 import spock.lang.Specification
 
 class LanguageDetectorTest extends Specification {
@@ -76,5 +79,54 @@ class LanguageDetectorTest extends Specification {
     def "detectAll returns empty list for empty input"() {
         expect:
             LanguageDetector.detectAll("").isEmpty()
+    }
+
+    def "Scores are the profile frequencies weighted by IDF, exactly as the profile files state them"() {
+        given: "the profiles read straight from the files"
+            List<LanguageProfile> profiles = profileFiles().collect { LanguageProfileCodec.read(it.newInputStream()) }
+            Map<String, Integer> documentFrequency = [:]
+            profiles.each { profile -> profile.ngrams.keySet().each { documentFrequency[it] = (documentFrequency[it] ?: 0) + 1 } }
+
+        and: "the input n-gram frequencies, as the extractor yields them"
+            def text = "Jeg husker ikke nøyaktig når det skjedde, men det var en gang jeg gikk gjennom skogen"
+            Map<String, Integer> counts = [:]
+            NgramExtractor.extract(text, NgramExtractor.DEFAULT_NGRAM_RANGE).each { counts[it] = (counts[it] ?: 0) + 1 }
+            double total = counts.values().sum()
+
+        when:
+            Map<String, Double> scores = LanguageDetector.detectAll(text).collectEntries { [it.language, it.score] }
+
+        then: "every language scores what the plain formula gives"
+            scores.size() == profiles.size()
+            profiles.every { profile -> Math.abs(scores[profile.language] - plainScore(profile, counts, total, documentFrequency, profiles.size())) < 1e-12 }
+    }
+
+    private static double plainScore(LanguageProfile profile, Map<String, Integer> counts, double total,
+                                     Map<String, Integer> documentFrequency, int languages) {
+        double score = 0.0d
+        counts.each { ngram, count ->
+            Integer df = documentFrequency[ngram]
+            Double weight = profile.ngrams[ngram]
+            if (df != null && weight != null) {
+                score += (count / total) * weight * Math.log(languages / (double) df)
+            }
+        }
+        score
+    }
+
+    def "Preload leaves detection as it was"() {
+        given:
+            def before = LanguageDetector.detectAll("The quick brown fox jumps over the lazy dog")
+
+        when:
+            LanguageDetector.preload()
+
+        then:
+            LanguageDetector.detectAll("The quick brown fox jumps over the lazy dog") == before
+    }
+
+    private static List<File> profileFiles() {
+        def dir = new File(LanguageDetectorTest.classLoader.getResource("profiles").toURI())
+        dir.listFiles().findAll { it.name.endsWith(".bin") }.sort { it.name }
     }
 }
