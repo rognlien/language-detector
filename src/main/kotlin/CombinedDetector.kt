@@ -5,6 +5,18 @@ import kotlin.math.ln
 object CombinedDetector {
     private const val SHORT_TEXT_NGRAM_SCALE = 0.3
     private const val LANGUAGE_COUNT = 34.0
+    private val wordPattern = Regex("[^\\p{L}]+")
+
+    /**
+     * Loads the language profiles and stopword tables now. Without this the first detection in
+     * a JVM pays for them — well over half a second — which a service should spend while starting
+     * up rather than on its first request.
+     */
+    @JvmStatic
+    fun preload() {
+        LanguageDetector.preload()
+        StopwordDetector.preload()
+    }
 
     @JvmStatic
     fun detect(text: String): String? {
@@ -32,7 +44,7 @@ object CombinedDetector {
             stopwordResults.add(DetectionResult("eng", ln(LANGUAGE_COUNT / 2.0)))
         }
 
-        val wordCount = text.split(Regex("[^\\p{L}]+")).count { it.isNotEmpty() }
+        val wordCount = text.split(wordPattern).count { it.isNotEmpty() }
         val bonusInjected = stopwordResults.size > originalStopwordResults.size
         val ngramScale =
             when {

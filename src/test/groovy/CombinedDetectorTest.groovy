@@ -151,4 +151,15 @@ class CombinedDetectorTest extends Specification {
             ngramOnly.every { it.score >= 0.0 }
             stopwordOnly.every { it.score >= 0.0 }
     }
+
+    def "Preload loads both detectors and leaves detection as it was"() {
+        given:
+            def before = CombinedDetector.detectAll("Le petit chat dort tranquillement sur le canapé")
+
+        when:
+            CombinedDetector.preload()
+
+        then:
+            CombinedDetector.detectAll("Le petit chat dort tranquillement sur le canapé") == before
+    }
 }

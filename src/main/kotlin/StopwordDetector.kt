@@ -7,6 +7,14 @@ object StopwordDetector {
     private val idfWeights: Map<String, Double> by lazy { computeIdf(stopwords) }
     private val charHints: Map<Char, Set<String>> by lazy { buildCharHints() }
     private val charIdfWeights: Map<Char, Double> by lazy { computeCharIdf(charHints) }
+    private val tokenPattern = Regex("[^\\p{L}]+")
+
+    /** Builds the stopword and character tables now, so the first detection does not pay for it. */
+    @JvmStatic
+    fun preload() {
+        idfWeights
+        charIdfWeights
+    }
 
     @JvmStatic
     fun detect(text: String): String? {
@@ -39,7 +47,7 @@ object StopwordDetector {
     }
 
     private fun tokenize(text: String): List<String> {
-        return text.split(Regex("[^\\p{L}]+"))
+        return text.split(tokenPattern)
             .filter { it.isNotEmpty() }
             .map { it.lowercase() }
     }
