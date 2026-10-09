@@ -1,11 +1,19 @@
 package com.github.rognlien
 
 class LanguageProfileBuilder(private val language: String) {
-    private val ngrams = mutableMapOf<String, Int>()
+    private val ngrams = mutableMapOf<String, Long>()
 
     fun append(text: String) {
-        NgramExtractor.extract(text).forEach {
-            ngrams.merge(it, 1, Int::plus)
+        append(text, 1L)
+    }
+
+    fun append(
+        text: String,
+        weight: Long,
+    ) {
+        require(weight > 0) { "Weight must be positive, was $weight" }
+        NgramExtractor.count(text).forEach { (ngram, count) ->
+            ngrams.merge(ngram, count * weight, Long::plus)
         }
     }
 
